@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Box, Typography, Button, Table, TableBody } from "@material-ui/core";
+import { Box, Typography, Table, TableBody } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 import RuleRow from "./RuleRow";
 import { ones, twos, threes, fours, fives, sixes, threeOfKind, fourOfKind, fullHouse, smallStraight, largeStraight, yahtzee, chance } from './Rules';
@@ -50,6 +50,16 @@ class ScoreTable extends Component {
     }
   }
 
+  checkForUpperBonus(){
+  	const upperScores = Object.values(this.props.scores).slice(0,6);
+  	const filled = upperScores.every(score => score !== undefined);
+  	if (filled) {
+  		const totalUpper = upperScores.reduce((total, curValue) => total + curValue);
+  		totalUpper >= 63 ? console.log("BONUSAS") : console.log("NO BONUS");
+  	}
+  	// console.log(filled);
+  }
+
   getTotalScore(){
     const {scores} = this.props;
     let totalScore = 0;
@@ -69,6 +79,8 @@ class ScoreTable extends Component {
 		const { descScores, scores, doScore, gameOver } = this.props;
 		const high_score = localStorage.getItem("highScore");
 		gameOver && this.setHighScore(high_score)
+		this.checkForUpperBonus();
+		// console.log("scoretable render");
 		return(
       <Box className={classes.scoreTable}>
         <Box component="section" px="1rem">
