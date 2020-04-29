@@ -29,6 +29,12 @@ const styles = {
 			backgroundPosition: "0% 51%"
 		}
 	},
+	ruleRowJoker: {
+		background: "red"
+	},
+	ruleRowNotJoker: {
+		background: "yellow"
+	},
   ruleRowCell: {
     borderBottom: "1px solid #c7b0ad",
     fontWeight: 300,
@@ -44,13 +50,27 @@ const styles = {
 
 class RuleRow extends Component {
   render() {
-  	const {classes, name, score, doScore, descScores} = this.props;
+  	const {classes, name, score, doScore, descScores, bonusYahtzee, availableJoker} = this.props;
   	const scoreNotUsed = score === undefined;
+  	let rowClasses = "";
   	let cellClasses = `${classes.ruleRowCell} `;
   	if (!scoreNotUsed) cellClasses += `${classes.ruleRowCellDisabled}`;
 
+  	if(scoreNotUsed){
+  		if(bonusYahtzee) {
+  			availableJoker && (rowClasses += `${classes.ruleRowJoker} ${classes.ruleRowActive}`);
+  			!availableJoker && (rowClasses += `${classes.ruleRowNotJoker}`);
+  		}
+  		else {
+  			rowClasses += `${classes.ruleRowActive}`;
+  		}
+  	}
+  	else {
+  		rowClasses += `${classes.ruleRowDisabled}`;
+  	}
+
     return (
-      <TableRow className={scoreNotUsed ? classes.ruleRowActive : classes.ruleRowDisabled} onClick={doScore}>
+      <TableRow className={rowClasses} onClick={doScore}>
         <TableCell align="left" className={cellClasses}>{name}</TableCell>
         <TableCell align="right" className={classes.ruleRowCell}>{scoreNotUsed ? descScores : score}</TableCell>
       </TableRow>

@@ -66,6 +66,12 @@ class ScoreTable extends Component {
     for(let key in scores){
       if(scores[key]) totalScore += scores[key];
     }
+  	const upperScores = Object.values(this.props.scores).slice(0,6);
+  	const filled = upperScores.every(score => score !== undefined);
+  	if (filled) {
+  		const totalUpper = upperScores.reduce((total, curValue) => total + curValue);
+  		return totalUpper >= 63 ? totalScore + 35 : totalScore;
+  	}
     return totalScore;
   }
 
@@ -76,7 +82,7 @@ class ScoreTable extends Component {
 
 	render(){
 		const { classes } = this.props;
-		const { descScores, scores, doScore, gameOver } = this.props;
+		const { descScores, scores, doScore, gameOver, availableJoker, bonusYahtzee } = this.props;
 		const high_score = localStorage.getItem("highScore");
 		gameOver && this.setHighScore(high_score)
 		this.checkForUpperBonus();
@@ -87,12 +93,12 @@ class ScoreTable extends Component {
           <Typography variant="h5" className={classes.scoreTableTitle}>Upper</Typography>
 	        <Table padding="none">
 	          <TableBody>
-	            <RuleRow name="Ones" score={scores.ones} doScore={evt => doScore("ones", ones.evalRoll)} descScores={descScores.ones} />
-	            <RuleRow name="Twos" score={scores.twos} doScore={evt => doScore("twos", twos.evalRoll)} descScores={descScores.twos} />
-	            <RuleRow name="Threes" score={scores.threes} doScore={evt => doScore("threes", threes.evalRoll)} descScores={descScores.threes} />
-	            <RuleRow name="Fours" score={scores.fours} doScore={evt => doScore("fours", fours.evalRoll)} descScores={descScores.fours} />
-	            <RuleRow name="Fives" score={scores.fives} doScore={evt => doScore("fives", fives.evalRoll)} descScores={descScores.fives} />
-	            <RuleRow name="Sixes" score={scores.sixes} doScore={evt => doScore("sixes", sixes.evalRoll)} descScores={descScores.sixes} />
+	            <RuleRow name="Ones" score={scores.ones} doScore={evt => doScore("ones", ones.evalRoll)} descScores={descScores.ones} bonusYahtzee={bonusYahtzee} availableJoker={availableJoker.ones} />
+	            <RuleRow name="Twos" score={scores.twos} doScore={evt => doScore("twos", twos.evalRoll)} descScores={descScores.twos} bonusYahtzee={bonusYahtzee} availableJoker={availableJoker.twos} />
+	            <RuleRow name="Threes" score={scores.threes} doScore={evt => doScore("threes", threes.evalRoll)} descScores={descScores.threes} bonusYahtzee={bonusYahtzee} availableJoker={availableJoker.threes} />
+	            <RuleRow name="Fours" score={scores.fours} doScore={evt => doScore("fours", fours.evalRoll)} descScores={descScores.fours} bonusYahtzee={bonusYahtzee} availableJoker={availableJoker.fours} />
+	            <RuleRow name="Fives" score={scores.fives} doScore={evt => doScore("fives", fives.evalRoll)} descScores={descScores.fives} bonusYahtzee={bonusYahtzee} availableJoker={availableJoker.fives} />
+	            <RuleRow name="Sixes" score={scores.sixes} doScore={evt => doScore("sixes", sixes.evalRoll)} descScores={descScores.sixes} bonusYahtzee={bonusYahtzee} availableJoker={availableJoker.sixes} />
 	          </TableBody>
 	        </Table>
         </Box>
@@ -100,13 +106,13 @@ class ScoreTable extends Component {
         	<Typography variant="h5" className={classes.scoreTableTitle}>Lower</Typography>
         	<Table padding="none">
         		<TableBody>
-        		  <RuleRow name="Three of Kind" score={scores.threeOfKind} doScore={evt => doScore("threeOfKind", threeOfKind.evalRoll)} descScores={descScores.threeOfKind} />
-              <RuleRow name="Four of Kind" score={scores.fourOfKind} doScore={evt => doScore("fourOfKind", fourOfKind.evalRoll)} descScores={descScores.fourOfKind} />
-              <RuleRow name="Full House" score={scores.fullHouse} doScore={evt => doScore("fullHouse", fullHouse.evalRoll)} descScores={descScores.fullHouse} />
-              <RuleRow name="Small Straight" score={scores.smallStraight} doScore={evt => doScore("smallStraight", smallStraight.evalRoll)} descScores={descScores.smallStraight} />
-              <RuleRow name="Large Straight" score={scores.largeStraight} doScore={evt => doScore("largeStraight", largeStraight.evalRoll)} descScores={descScores.largeStraight} />
-              <RuleRow name="Yahtzee" score={scores.yahtzee} doScore={evt => doScore("yahtzee", yahtzee.evalRoll)} descScores={descScores.yahtzee} />
-              <RuleRow name="Chance" score={scores.chance} doScore={evt => doScore("chance", chance.evalRoll)} descScores={descScores.chance} />
+        		  <RuleRow name="Three of Kind" score={scores.threeOfKind} doScore={evt => doScore("threeOfKind", threeOfKind.evalRoll)} descScores={descScores.threeOfKind} bonusYahtzee={bonusYahtzee} availableJoker={availableJoker.threeOfKind} />
+              <RuleRow name="Four of Kind" score={scores.fourOfKind} doScore={evt => doScore("fourOfKind", fourOfKind.evalRoll)} descScores={descScores.fourOfKind} bonusYahtzee={bonusYahtzee} availableJoker={availableJoker.fourOfKind} />
+              <RuleRow name="Full House" score={scores.fullHouse} doScore={evt => doScore("fullHouse", fullHouse.evalRoll)} descScores={descScores.fullHouse} bonusYahtzee={bonusYahtzee} availableJoker={availableJoker.fullHouse} />
+              <RuleRow name="Small Straight" score={scores.smallStraight} doScore={evt => doScore("smallStraight", smallStraight.evalRoll)} descScores={descScores.smallStraight} bonusYahtzee={bonusYahtzee} availableJoker={availableJoker.smallStraight} />
+              <RuleRow name="Large Straight" score={scores.largeStraight} doScore={evt => doScore("largeStraight", largeStraight.evalRoll)} descScores={descScores.largeStraight} bonusYahtzee={bonusYahtzee} availableJoker={availableJoker.largeStraight} />
+              <RuleRow name="Yahtzee" score={scores.yahtzee} doScore={evt => doScore("yahtzee", yahtzee.evalRoll)} descScores={descScores.yahtzee} bonusYahtzee={bonusYahtzee} availableJoker={availableJoker.yahtzee} />
+              <RuleRow name="Chance" score={scores.chance} doScore={evt => doScore("chance", chance.evalRoll)} descScores={descScores.chance} bonusYahtzee={bonusYahtzee} availableJoker={availableJoker.chance} />
         		</TableBody>
         	</Table>
         </Box>

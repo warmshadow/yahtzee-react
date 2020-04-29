@@ -83,6 +83,7 @@ class Game extends Component {
     this.roll = this.roll.bind(this);
     this.doScore = this.doScore.bind(this);
     this.toggleLocked = this.toggleLocked.bind(this);
+    this.bonusYahtzee = this.bonusYahtzee.bind(this);
     this.checkIfOver = this.checkIfOver.bind(this);
     this.resetState = this.resetState.bind(this);
 	}
@@ -93,7 +94,6 @@ class Game extends Component {
       locked: Array(NUM_DICE).fill(false),
       rollsLeft: NUM_ROLLS,
       rolling: false,
-      gameOver: false,
       scores: {
         ones: undefined,
         twos: undefined,
@@ -108,18 +108,42 @@ class Game extends Component {
         largeStraight: undefined,
         yahtzee: undefined,
         chance: undefined
-      }
+      },
+      gameOver: false,
+      bonusYahtzee: false,
+      availableJoker: {
+        ones: false,
+        twos: false,
+        threes: false,
+        fours: false,
+        fives: false,
+        sixes: false,
+        threeOfKind: false,
+        fourOfKind: false,
+        fullHouse: false,
+        smallStraight: false,
+        largeStraight: false,
+        yahtzee: false,
+        chance: false
+      },
     };
     return initialState;
   }
 
-    resetState(){
+  resetState(){
     this.setState(this.getInitialState);
     this.animateRoll();
   }
 
   componentDidMount() {
     this.animateRoll();
+    console.log("componentDidMount");
+  }
+
+  componentDidUpdate() {
+  	console.log("componentDidUpdate");
+  	this.checkIfOver();
+  	// this.bonusYahtzee();
   }
 
   animateRoll(){
@@ -137,8 +161,10 @@ class Game extends Component {
       ),
       locked: st.rollsLeft > 1 ? st.locked : Array(NUM_DICE).fill(true),
       rollsLeft: st.rollsLeft - 1,
-      rolling: false
-    }));
+      rolling: false,
+      availableJoker: st.bonusYahtzee ? this.getInitialState().availableJoker : st.availableJoker,
+      bonusYahtzee: false
+    }), () => { this.bonusYahtzee() });
   }
 
   toggleLocked(idx) {
@@ -178,6 +204,54 @@ class Game extends Component {
     return messages[this.state.rollsLeft];
   }
 
+  bonusYahtzee(){
+  	const diceValues = this.state.dice;
+  	const allEqual = diceValues.every(v => v === diceValues[0]);
+  	if ( !this.state.rolling && !this.state.bonusYahtzee && allEqual && this.state.scores.yahtzee !== undefined ) {
+  		const number = diceValues[0];
+  		const scoreNames = Object.keys(this.state.scores);
+  		const scoreName = scoreNames[number - 1];
+  		console.log("BONUS YAHTZEE");
+  		if ( this.state.scores[scoreNames[number - 1]] === undefined ){
+  			console.log("THAT upper is free");
+  			console.log(scoreNames[number - 1]);
+  			this.setState(st => ({
+  				bonusYahtzee: true,
+  				availableJoker: { ...st.availableJoker, [scoreName]: true }
+  			}));
+  		}
+  		else {
+  			let availableJoker = {...this.state.availableJoker};
+  			const lowerNames = scoreNames.slice(6);
+  			const lowerAvailable = lowerNames.some(score => this.state.scores[score] === undefined);
+  			if (lowerAvailable) {
+  				console.log("Lower available");
+  				lowerNames.forEach(ls => {
+  					if (this.state.scores[ls] === undefined) availableJoker[ls] = true;
+  				});
+  				this.setState(st => ({
+  					bonusYahtzee: true,
+  					availableJoker: availableJoker
+  				}));
+  			}
+  			else {
+  				const upperNames = scoreNames.slice(0,6);
+  				console.log("Any upper");
+  				upperNames.forEach(ls => {
+  					if (this.state.scores[ls] === undefined) availableJoker[ls] = true;
+  				});
+  				this.setState(st => ({
+  					bonusYahtzee: true,
+  					availableJoker: availableJoker
+  				}));
+  			}
+  		}
+  	}
+  	else {
+  		console.log("NOPE");
+  	}
+  }
+
   checkIfOver(){
     const scoreBoardFull = !Object.values(this.state.scores).some(s => s === undefined);
     if(!this.state.gameOver && scoreBoardFull){
@@ -186,10 +260,10 @@ class Game extends Component {
   }
 
 	render(){
-		const {dice, locked, rollsLeft, rolling, scores, gameOver} = this.state;
+		const {dice, locked, rollsLeft, rolling, scores, gameOver, bonusYahtzee, availableJoker} = this.state;
 		const { classes, width } = this.props;
 		const buttonClasses = width === 'xs' ? `${classes.gameReroll} ${classes.gameRerollXS}` : classes.gameReroll;
-		this.checkIfOver();
+		console.log("game render");
 		return (
 			<Container maxWidth="sm" className={classes.game}>
         <Box component="header" px="3rem" className={classes.gameHeader}>
@@ -218,7 +292,7 @@ class Game extends Component {
             </Box>
         </Box>
         <Box className={classes.gameScores}>
-	        <ScoreTable doScore={this.doScore} scores={scores} gameOver={gameOver}/>
+	        <ScoreTable doScore={this.doScore} scores={scores} gameOver={gameOver} bonusYahtzee={bonusYahtzee} availableJoker={availableJoker}/>
         </Box>
       </Container>
 		);
