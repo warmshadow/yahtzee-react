@@ -57,36 +57,77 @@ class SumDistro extends Rule {
 
 /** Check if full house (3-of-kind and 2-of-kind) */
 
+// class FullHouse extends Rule {
+//   // TODO
+//   evalRoll = dice => {
+//     return this.freq(dice).some(c => c === 3) && this.freq(dice).some(c => c === 2) ? this.score : 0;
+//   }
+// }
 class FullHouse extends Rule {
   // TODO
-  evalRoll = dice => {
-    return this.freq(dice).some(c => c === 3) && this.freq(dice).some(c => c === 2) ? this.score : 0;
+  evalRoll = (dice, bonusYahtzee) => {
+    if (!bonusYahtzee) {
+      return this.freq(dice).some(c => c === 3) && this.freq(dice).some(c => c === 2) ? this.score : 0;
+    } 
+    else {
+      return this.score;
+    }
   }
 }
 
 /** Check for small straights. */
 
+// class SmallStraight extends Rule {
+//   // TODO
+//   evalRoll = dice => {
+//     const d = new Set(dice);
+//     return (
+//       (d.size === 5 && (!d.has(1) || !d.has(6))) 
+//       || (d.size === 4 && (!d.has(5) && !d.has(6))) 
+//       || (d.size === 4 && (!d.has(1) && !d.has(6))) 
+//       || (d.size === 4 && (!d.has(1) && !d.has(2)))
+//     ) ? this.score : 0;
+//   };
+// }
 class SmallStraight extends Rule {
   // TODO
-  evalRoll = dice => {
-    const d = new Set(dice);
-    return (
-      (d.size === 5 && (!d.has(1) || !d.has(6))) 
-      || (d.size === 4 && (!d.has(5) && !d.has(6))) 
-      || (d.size === 4 && (!d.has(1) && !d.has(6))) 
-      || (d.size === 4 && (!d.has(1) && !d.has(2)))
-    ) ? this.score : 0;
+  evalRoll = (dice, bonusYahtzee) => {
+    if (!bonusYahtzee) {
+      const d = new Set(dice);
+      return (
+        (d.size === 5 && (!d.has(1) || !d.has(6))) 
+        || (d.size === 4 && (!d.has(5) && !d.has(6))) 
+        || (d.size === 4 && (!d.has(1) && !d.has(6))) 
+        || (d.size === 4 && (!d.has(1) && !d.has(2)))
+      ) ? this.score : 0;
+    }
+    else {
+      return this.score;     
+    }
   };
 }
 
 /** Check for large straights. */
 
-class LargeStraight extends Rule {
-  evalRoll = dice => {
-    const d = new Set(dice);
+// class LargeStraight extends Rule {
+//   evalRoll = dice => {
+//     const d = new Set(dice);
 
-    // large straight must be 5 different dice & only one can be a 1 or a 6
-    return d.size === 5 && (!d.has(1) || !d.has(6)) ? this.score : 0;
+//     // large straight must be 5 different dice & only one can be a 1 or a 6
+//     return d.size === 5 && (!d.has(1) || !d.has(6)) ? this.score : 0;
+//   };
+// }
+
+class LargeStraight extends Rule {
+  evalRoll = (dice, bonusYahtzee) => {
+    if (!bonusYahtzee) {
+      const d = new Set(dice);
+      // large straight must be 5 different dice & only one can be a 1 or a 6
+      return d.size === 5 && (!d.has(1) || !d.has(6)) ? this.score : 0;
+    }
+    else {
+      return this.score;
+    }
   };
 }
 

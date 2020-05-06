@@ -25,21 +25,20 @@ class Dice extends Component {
 	}
 
 	render(){
-		const {dice, sides, locked, disabled, rolling, handleClick} = this.props;
-		const {classes} = this.props;
+		const {classes, dice, sides, locked, disabled, rolling, handleClick} = this.props;
 		return (
 			<Box className={classes.dice}>
 				{dice.map((d, idx) =>
-        <Die 
-        	handleClick={handleClick}
-          val={d}
-          side={sides[d]}
-          locked={locked[idx]}
-          disabled={disabled}
-          rolling={rolling && !locked[idx]}
-          idx={idx}
-          key={idx} 
-        />
+	        <Die 
+	        	handleClick={handleClick}
+	          val={d}
+	          side={sides[d]}
+	          locked={locked[idx]}
+	          disabled={disabled}
+	          rolling={rolling && !locked[idx]}
+	          idx={idx}
+	          key={idx} 
+	        />
       	)}
 			</Box>
 		);

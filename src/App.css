@@ -1,9 +1,4 @@
-html, body, #root {
-	height: 100%;
-}
-
 .App {
-  font-family: sans-serif;
   text-align: center;
   background: linear-gradient(to right, #cfcfc9, #E0E0C2, #cfcfc9);
   height: 100%;

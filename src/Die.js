@@ -5,9 +5,8 @@ import clsx from 'clsx';
 import withWidth from '@material-ui/core/withWidth';
 
 const styles = {
-	Die: {
+	die: {
 		color: "white",
-		// color: "#ebeae9",
 		cursor: "pointer",
 		filter: "drop-shadow(0 19px 10px rgba(0, 0, 0, 0.3)) drop-shadow(0 15px 10px rgba(0, 0, 0, 0.1))",
 		transition: "all 0.3s ease",
@@ -15,17 +14,17 @@ const styles = {
 			opacity: 0.8
 		}
 	},
-	DieLocked: {
+	dieLocked: {
 		opacity: 0.5,
   	filter: "none",
   	'&:hover': {
   		opacity: 0.5
   	}
 	},
-	DieDisabled: {
+	dieDisabled: {
 		cursor: "not-allowed"
 	},
-	DieRolling: {
+	dieRolling: {
 		animation: "$spin 1s ease-out"
 	},
 	'@keyframes spin': {
@@ -45,12 +44,14 @@ class Die extends Component {
 
 	render(){
 		const {locked, rolling, side, disabled, classes} = this.props;
-		let iconClasses = classes.Die;
-		if (locked) iconClasses = clsx(iconClasses, classes.DieLocked);
-		if (rolling) iconClasses = clsx(iconClasses, classes.DieRolling);
-		if (disabled) iconClasses = clsx(iconClasses, classes.DieDisabled);
+		const iconClasses = clsx(classes.die, { 
+			[classes.dieLocked]: locked,  
+			[classes.dieRolling]: rolling, 
+			[classes.dieDisabled]: disabled 
+		});
+
 		const iconSize = this.props.width === 'xs' ? '3x' : '4x';
-		return(
+		return (
 			<FontAwesomeIcon 
 				icon={side} 
 				size={iconSize}

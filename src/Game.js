@@ -1,30 +1,34 @@
 import React, { Component } from 'react';
-import { Container, Box, Typography, Button } from "@material-ui/core";
+import { Container, Box, Typography, Button, Hidden } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
+import withWidth from '@material-ui/core/withWidth';
 import Dice from "./Dice";
 import ScoreTable from "./ScoreTable";
-import withWidth from '@material-ui/core/withWidth';
-
+import clsx from 'clsx';
+import "./animations.css";
 
 const styles = {
-  game: {
+  gameContainer: {
     boxShadow: "0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.1)",
     padding: 0,
     margin: "auto"
-    // height: "80%",
   },
   gameHeader: {
     background: "linear-gradient(45deg, #ab4f44, #737F7C)",
-    backgroundSize: "400% 400%",
-    // animation: "$Gradient 15s ease infinite",
-    // height: "32%"
+    backgroundSize: "150% 150%",
   },
   gameTitle: {
     color: "white",
     fontWeight: 100,
     padding: "1rem 0"
   },
-  gameReroll: {
+  gameBonusTitle: {
+    color: "white",
+    padding: "1rem 0",
+    fontFamily: "Arial, sans-serif",
+    fontStyle: "bold"
+  },
+  gameButton: {
     padding: 0,
     fontSize: "1.5em",
     color: "#95625A",
@@ -44,30 +48,14 @@ const styles = {
     },
     '&:disabled': {
       color: "darkgray",
-      backgroundColor: "#ddd",
       cursor: "not-allowed",
       opacity: 0.5,
       pointerEvents: "auto",
     }
   },
-  gameRerollXS: {
+  gameButtonXS: {
   	width: "65%",
-  	fontSize: "1.2rem"
-  },
-  gameScores: {
-  	backgroundColor: "white",
-  	// height: "68%",
-  },
-  '@keyframes Gradient': {
-    "0%": {
-      backgroundPosition: "0% 50%"
-    },
-    "50%": {
-      backgroundPosition: "100% 50%"
-    },
-    "100%": {
-      backgroundPosition: "0% 50%"
-    }
+  	fontSize: "1.2em"
   }
 };
 
@@ -83,12 +71,13 @@ class Game extends Component {
     this.roll = this.roll.bind(this);
     this.doScore = this.doScore.bind(this);
     this.toggleLocked = this.toggleLocked.bind(this);
+    this.checkForUpperBonus = this.checkForUpperBonus.bind(this);
     this.bonusYahtzee = this.bonusYahtzee.bind(this);
     this.checkIfOver = this.checkIfOver.bind(this);
     this.resetState = this.resetState.bind(this);
 	}
 
-	getInitialState() {
+	getInitialState(){
     const initialState = {
       dice: Array.from({ length: NUM_DICE }).map(d => 5),
       locked: Array(NUM_DICE).fill(false),
@@ -111,6 +100,9 @@ class Game extends Component {
       },
       gameOver: false,
       bonusYahtzee: false,
+      getsYahtzeeBonus: false,
+      bonusYahtzeePoints: 0,
+      bonusUpperPoints: undefined,
       availableJoker: {
         ones: false,
         twos: false,
@@ -135,26 +127,25 @@ class Game extends Component {
     this.animateRoll();
   }
 
-  componentDidMount() {
+  componentDidMount(){
     this.animateRoll();
     console.log("componentDidMount");
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(){
   	console.log("componentDidUpdate");
-  	this.checkIfOver();
-  	// this.bonusYahtzee();
+  	this.bonusYahtzee(); /////////DELETE
   }
 
   animateRoll(){
+    console.log("animateROLL");
     this.setState({rolling: true}, () => {
       setTimeout(this.roll, 1000);
     });
   }
 
-  roll(evt) {
-    // roll dice whose indexes are in reroll
-    //console.log(typeof this.state.dice[2]);
+  roll(evt){
+    console.log("ROLL");
     this.setState(st => ({
       dice: st.dice.map((d, i) =>
         st.locked[i] ? d : Math.ceil(Math.random() * 6)
@@ -163,13 +154,14 @@ class Game extends Component {
       rollsLeft: st.rollsLeft - 1,
       rolling: false,
       availableJoker: st.bonusYahtzee ? this.getInitialState().availableJoker : st.availableJoker,
-      bonusYahtzee: false
+      bonusYahtzee: false,
+      getsYahtzeeBonus: false,
     }), () => { this.bonusYahtzee() });
   }
 
-  toggleLocked(idx) {
-    // toggle whether idx is in locked or not
-    if(this.state.rollsLeft && !this.state.rolling){
+  toggleLocked(idx){
+    // toggle whether idx for dice is locked or not
+    if (this.state.rollsLeft && !this.state.rolling && !this.state.gameOver){
       this.setState(st => ({
         locked: [
           ...st.locked.slice(0, idx),
@@ -180,18 +172,39 @@ class Game extends Component {
     }
   }
 
-  doScore(rulename, ruleFn) {
+  doScore(rulename, ruleFn){
+    console.log("doSCORE");
+    const ruleFnResult = ["fullHouse", "smallStraight","largeStraight"].includes(rulename) ? ruleFn(this.state.dice, this.state.bonusYahtzee) : ruleFn(this.state.dice); 
     // evaluate this ruleFn with the dice and score this rulename
     if(!this.state.rolling){
-      if(this.state.scores[rulename] === undefined){
+      if( 
+        (!this.state.bonusYahtzee && this.state.scores[rulename] === undefined) 
+        || (this.state.bonusYahtzee && this.state.availableJoker[rulename]) 
+      ) {
         this.setState(st => ({
-          scores: { ...st.scores, [rulename]: ruleFn(this.state.dice) },
+          scores: { ...st.scores, [rulename]: ruleFnResult },
           rollsLeft: NUM_ROLLS,
-          locked: Array(NUM_DICE).fill(false)
-        }));
-        this.animateRoll();
+          locked: Array(NUM_DICE).fill(false),
+          bonusYahtzeePoints: st.getsYahtzeeBonus ? st.bonusYahtzeePoints + 100 : st.bonusYahtzeePoints
+        }), () => { this.checkForUpperBonus() });
       }
     }
+  }
+
+  //del bonusYahtzee checko paziet dar tikrinimas ar !this.state.bonusYahtzee manro nereikalingas, nes pries kvieciant yra nusetinamas i false. ir del !this.state.rolling dar pagalvot
+  checkForUpperBonus(){
+    console.log("checkforupperbonus");
+    const bonusUpperNotSet = this.state.bonusUpperPoints === undefined;
+    const upperScores = Object.values(this.state.scores).slice(0,6);
+    const upperFilled = upperScores.every(score => score !== undefined);
+    if(bonusUpperNotSet && upperFilled){
+      const totalUpperScores = upperScores.reduce((total, curScore) => total + curScore);
+      this.setState({
+        bonusUpperPoints: totalUpperScores >= 63 ? 35 : 0
+      });
+      this.checkIfOver();
+    }
+    else { this.checkIfOver() }
   }
 
   displayRollInfo(){
@@ -205,95 +218,120 @@ class Game extends Component {
   }
 
   bonusYahtzee(){
+    console.log("bonusYahtzee");
   	const diceValues = this.state.dice;
+    const scores = this.state.scores;
   	const allEqual = diceValues.every(v => v === diceValues[0]);
-  	if ( !this.state.rolling && !this.state.bonusYahtzee && allEqual && this.state.scores.yahtzee !== undefined ) {
+
+  	if(allEqual && scores.yahtzee !== undefined){
   		const number = diceValues[0];
-  		const scoreNames = Object.keys(this.state.scores);
-  		const scoreName = scoreNames[number - 1];
-  		console.log("BONUS YAHTZEE");
-  		if ( this.state.scores[scoreNames[number - 1]] === undefined ){
-  			console.log("THAT upper is free");
-  			console.log(scoreNames[number - 1]);
+  		const allScoreNames = Object.keys(scores);
+  		const scoreName = allScoreNames[number - 1];
+  		if(scores[allScoreNames[number - 1]] === undefined){
   			this.setState(st => ({
   				bonusYahtzee: true,
-  				availableJoker: { ...st.availableJoker, [scoreName]: true }
+  				availableJoker: { ...st.availableJoker, [scoreName]: true },
+          getsYahtzeeBonus: st.scores.yahtzee === 50 ? true : false
   			}));
   		}
   		else {
   			let availableJoker = {...this.state.availableJoker};
-  			const lowerNames = scoreNames.slice(6);
-  			const lowerAvailable = lowerNames.some(score => this.state.scores[score] === undefined);
-  			if (lowerAvailable) {
-  				console.log("Lower available");
+  			const lowerNames = allScoreNames.slice(6);
+  			const lowerAvailable = lowerNames.some(score => scores[score] === undefined);
+  			if(lowerAvailable){
   				lowerNames.forEach(ls => {
-  					if (this.state.scores[ls] === undefined) availableJoker[ls] = true;
+  					if(scores[ls] === undefined) availableJoker[ls] = true;
   				});
   				this.setState(st => ({
   					bonusYahtzee: true,
-  					availableJoker: availableJoker
+  					availableJoker: availableJoker,
+            getsYahtzeeBonus: st.scores.yahtzee === 50 ? true : false
   				}));
   			}
   			else {
-  				const upperNames = scoreNames.slice(0,6);
-  				console.log("Any upper");
+  				const upperNames = allScoreNames.slice(0,6);
   				upperNames.forEach(ls => {
-  					if (this.state.scores[ls] === undefined) availableJoker[ls] = true;
+  					if(scores[ls] === undefined) availableJoker[ls] = true;
   				});
   				this.setState(st => ({
   					bonusYahtzee: true,
-  					availableJoker: availableJoker
+  					availableJoker: availableJoker,
+            getsYahtzeeBonus: st.scores.yahtzee === 50 ? true : false
   				}));
   			}
   		}
   	}
-  	else {
-  		console.log("NOPE");
-  	}
   }
 
   checkIfOver(){
-    const scoreBoardFull = !Object.values(this.state.scores).some(s => s === undefined);
-    if(!this.state.gameOver && scoreBoardFull){
-      this.setState({gameOver: true});
+    console.log("checkIFOVER");
+    const scoreBoardFull = Object.values(this.state.scores).every(s => s !== undefined);
+    if(scoreBoardFull){
+      this.setState({
+        gameOver: true,
+        bonusYahtzee: false,
+        locked: Array(NUM_DICE).fill(true)
+      });
+    }
+    else { 
+      this.animateRoll(); 
     }
   }
 
 	render(){
-		const {dice, locked, rollsLeft, rolling, scores, gameOver, bonusYahtzee, availableJoker} = this.state;
-		const { classes, width } = this.props;
-		const buttonClasses = width === 'xs' ? `${classes.gameReroll} ${classes.gameRerollXS}` : classes.gameReroll;
+		const { dice, locked, rollsLeft, rolling, scores, bonusUpperPoints, 
+            gameOver, bonusYahtzee, bonusYahtzeePoints, availableJoker } = this.state;
+		const classes = this.props.classes;
+    const buttonClasses = this.props.width === 'xs' ? clsx(classes.gameButton, classes.gameButtonXS) : classes.gameButton;
 		console.log("game render");
 		return (
-			<Container maxWidth="sm" className={classes.game}>
+			<Container maxWidth="sm" className={classes.gameContainer}>
         <Box component="header" px="3rem" className={classes.gameHeader}>
-          <Typography variant="h2" className={classes.gameTitle}>
-            Yahtzee!
-          </Typography>
-          <Box>
-            <Box component="section">
-	            <Dice
-	              dice={dice}
-	              locked={locked}
-	              handleClick={this.toggleLocked}
-	              disabled={!rollsLeft}
-	              rolling={rolling}
-	            />
-            </Box>  
-            <Box>
-              <Button 
-              	disabled={locked.every(x => x) || !rollsLeft /*delete?kainolefttinkapirmas*/ || rolling} 
-              	className={buttonClasses} 
-              	onClick={this.animateRoll}
-              >
-              	{this.displayRollInfo()}
-              </Button>
-              </Box>
-            </Box>
+          <Hidden xsUp={bonusYahtzee}>
+            <Typography variant="h2" className={classes.gameTitle}>
+              Yahtzee!
+            </Typography>
+          </Hidden>
+          <Hidden xsUp={!bonusYahtzee}>
+            <Typography variant="h2" className={clsx(classes.gameBonusTitle, "bounceIn")}>
+              BONUS!!!
+            </Typography>
+          </Hidden>
+          <Dice
+            dice={dice}
+            locked={locked}
+            handleClick={this.toggleLocked}
+            disabled={!rollsLeft || gameOver}
+            rolling={rolling}
+          />
+          <Hidden xsUp={gameOver} >
+            <Button 
+            	disabled={locked.every(x => x) || rolling} 
+            	className={buttonClasses}
+            	onClick={this.animateRoll}
+            >
+            	{this.displayRollInfo()}
+            </Button>
+          </Hidden>             
+          <Hidden xsUp={!gameOver} >
+            <Button
+              className={buttonClasses} 
+              style={{fontStyle: 'italic'}}
+              onClick={this.resetState}
+            >
+              PLAY AGAIN?
+            </Button>
+          </Hidden>
         </Box>
-        <Box className={classes.gameScores}>
-	        <ScoreTable doScore={this.doScore} scores={scores} gameOver={gameOver} bonusYahtzee={bonusYahtzee} availableJoker={availableJoker}/>
-        </Box>
+        <ScoreTable 
+          doScore={this.doScore} 
+          scores={scores} 
+          bonusUpperPoints={bonusUpperPoints} 
+          gameOver={gameOver} 
+          bonusYahtzee={bonusYahtzee} 
+          bonusYahtzeePoints={bonusYahtzeePoints} 
+          availableJoker={availableJoker}
+        />
       </Container>
 		);
 	}
