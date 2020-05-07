@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { Box, Typography, Table, TableBody, Hidden } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 import RuleRow from "./RuleRow";
@@ -43,7 +43,7 @@ const styles = {
   }
 };
 
-class ScoreTable extends Component {
+class ScoreTable extends PureComponent {
 	static defaultProps = {
     descScores: {
       ones: "1 point per 1",
@@ -85,7 +85,7 @@ class ScoreTable extends Component {
 
     const curHighScore = localStorage.getItem("highScore");
     const highScore = gameOver ? this.setHighScore(curHighScore) : curHighScore ;
-
+    //additional classes/animations from animations.css file
     const upperBonusClasses = clsx(classes.bonus, "bounceIn", { "dropUpper": gameOver });
     const yahtzeeBonusClasses = clsx(classes.bonus, "bounceIn", { "dropLower": gameOver });
     const totalScoreClasses = clsx(classes.totalScore, { "pulsateTotalScore": gameOver });

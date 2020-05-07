@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { withStyles } from "@material-ui/core/styles";
-import clsx from 'clsx';
 import withWidth from '@material-ui/core/withWidth';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import clsx from 'clsx';
 
 const styles = {
 	die: {

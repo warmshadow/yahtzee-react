@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { withStyles } from "@material-ui/core/styles";
 import { TableRow, TableCell } from "@material-ui/core";
+import { withStyles } from "@material-ui/core/styles";
 import clsx from 'clsx';
 
 const styles = {
@@ -63,6 +63,7 @@ class RuleRow extends Component {
   	let rowClasses;
     if(scoreNotUsed) {
       if(bonusYahtzee) {
+        //when bonus yahtzee highlight only those allowed to score
         rowClasses = clsx({
           [classes.rowActive]: availableJoker,
           [classes.rowJoker]: availableJoker,

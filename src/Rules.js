@@ -50,21 +50,16 @@ class TotalOneNumber extends Rule {
 
 class SumDistro extends Rule {
   evalRoll = dice => {
-    // do any of the counts meet of exceed this distro?
+    // do any of the counts meet or exceed this distro?
     return this.freq(dice).some(c => c >= this.count) ? this.sum(dice) : 0;
   };
 }
 
-/** Check if full house (3-of-kind and 2-of-kind) */
+/** Check if full house (3-of-kind and 2-of-kind) 
+ * Also bonus yahtzee gets full score
+*/
 
-// class FullHouse extends Rule {
-//   // TODO
-//   evalRoll = dice => {
-//     return this.freq(dice).some(c => c === 3) && this.freq(dice).some(c => c === 2) ? this.score : 0;
-//   }
-// }
 class FullHouse extends Rule {
-  // TODO
   evalRoll = (dice, bonusYahtzee) => {
     if (!bonusYahtzee) {
       return this.freq(dice).some(c => c === 3) && this.freq(dice).some(c => c === 2) ? this.score : 0;
@@ -75,22 +70,11 @@ class FullHouse extends Rule {
   }
 }
 
-/** Check for small straights. */
+/** Check for small straights. 
+ * Also bonus yahtzee gets full score
+*/
 
-// class SmallStraight extends Rule {
-//   // TODO
-//   evalRoll = dice => {
-//     const d = new Set(dice);
-//     return (
-//       (d.size === 5 && (!d.has(1) || !d.has(6))) 
-//       || (d.size === 4 && (!d.has(5) && !d.has(6))) 
-//       || (d.size === 4 && (!d.has(1) && !d.has(6))) 
-//       || (d.size === 4 && (!d.has(1) && !d.has(2)))
-//     ) ? this.score : 0;
-//   };
-// }
 class SmallStraight extends Rule {
-  // TODO
   evalRoll = (dice, bonusYahtzee) => {
     if (!bonusYahtzee) {
       const d = new Set(dice);
@@ -107,16 +91,9 @@ class SmallStraight extends Rule {
   };
 }
 
-/** Check for large straights. */
-
-// class LargeStraight extends Rule {
-//   evalRoll = dice => {
-//     const d = new Set(dice);
-
-//     // large straight must be 5 different dice & only one can be a 1 or a 6
-//     return d.size === 5 && (!d.has(1) || !d.has(6)) ? this.score : 0;
-//   };
-// }
+/** Check for large straights. 
+ * Also bonus yahtzee gets full score
+*/
 
 class LargeStraight extends Rule {
   evalRoll = (dice, bonusYahtzee) => {
@@ -162,7 +139,7 @@ const largeStraight = new LargeStraight({ score: 40 });
 // yahtzee scores as 50
 const yahtzee = new Yahtzee({ score: 50 });
 
-// for chance, can view as some of all dice, requiring at least 0 of a kind
+// for chance, can view as sum of all dice, requiring at least 0 of a kind
 const chance = new SumDistro({ count: 0 });
 
 export {

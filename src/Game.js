@@ -99,10 +99,10 @@ class Game extends Component {
         chance: undefined
       },
       gameOver: false,
+      bonusUpperPoints: undefined,
       bonusYahtzee: false,
       getsYahtzeeBonus: false,
       bonusYahtzeePoints: 0,
-      bonusUpperPoints: undefined,
       availableJoker: {
         ones: false,
         twos: false,
@@ -134,7 +134,7 @@ class Game extends Component {
 
   componentDidUpdate(){
   	console.log("componentDidUpdate");
-  	this.bonusYahtzee(); /////////DELETE
+  	// this.bonusYahtzee(); /////////DELETE
   }
 
   animateRoll(){
@@ -146,6 +146,7 @@ class Game extends Component {
 
   roll(evt){
     console.log("ROLL");
+    //roll unlocked dice and reset bonus yahtzee related states
     this.setState(st => ({
       dice: st.dice.map((d, i) =>
         st.locked[i] ? d : Math.ceil(Math.random() * 6)
@@ -160,7 +161,7 @@ class Game extends Component {
   }
 
   toggleLocked(idx){
-    // toggle whether idx for dice is locked or not
+    //toggle whether idx for dice is locked or not
     if (this.state.rollsLeft && !this.state.rolling && !this.state.gameOver){
       this.setState(st => ({
         locked: [
@@ -174,8 +175,13 @@ class Game extends Component {
 
   doScore(rulename, ruleFn){
     console.log("doSCORE");
-    const ruleFnResult = ["fullHouse", "smallStraight","largeStraight"].includes(rulename) ? ruleFn(this.state.dice, this.state.bonusYahtzee) : ruleFn(this.state.dice); 
-    // evaluate this ruleFn with the dice and score this rulename
+    //calculate the score for the rulename by calling a rule function
+    //when bonus yahtzee only allow specific ones to be scored and add bonus points if available
+    //
+    //pass two params instead of one to functions for fullHouse and both straights (different scoring for bonus yahtzee)
+    const ruleFnResult = ["fullHouse", "smallStraight","largeStraight"].includes(rulename) 
+    ? ruleFn(this.state.dice, this.state.bonusYahtzee) 
+    : ruleFn(this.state.dice); 
     if(!this.state.rolling){
       if( 
         (!this.state.bonusYahtzee && this.state.scores[rulename] === undefined) 
@@ -191,9 +197,9 @@ class Game extends Component {
     }
   }
 
-  //del bonusYahtzee checko paziet dar tikrinimas ar !this.state.bonusYahtzee manro nereikalingas, nes pries kvieciant yra nusetinamas i false. ir del !this.state.rolling dar pagalvot
   checkForUpperBonus(){
     console.log("checkforupperbonus");
+    //set the upper bonus score when all upper section is filled
     const bonusUpperNotSet = this.state.bonusUpperPoints === undefined;
     const upperScores = Object.values(this.state.scores).slice(0,6);
     const upperFilled = upperScores.every(score => score !== undefined);
@@ -219,6 +225,7 @@ class Game extends Component {
 
   bonusYahtzee(){
     console.log("bonusYahtzee");
+    //check for rolled bonus yahtzee, set rule rows available for scoring it and determine if bonus points will be given
   	const diceValues = this.state.dice;
     const scores = this.state.scores;
   	const allEqual = diceValues.every(v => v === diceValues[0]);
@@ -265,6 +272,7 @@ class Game extends Component {
 
   checkIfOver(){
     console.log("checkIFOVER");
+    //game over when whole scoretable is filled
     const scoreBoardFull = Object.values(this.state.scores).every(s => s !== undefined);
     if(scoreBoardFull){
       this.setState({

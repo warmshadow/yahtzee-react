@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import Die from "./Die.js";
-import { withStyles } from "@material-ui/core/styles";
 import { Box } from "@material-ui/core";
+import { withStyles } from "@material-ui/core/styles";
+import Die from "./Die.js";
 import { faDiceOne, faDiceTwo, faDiceThree, faDiceFour, faDiceFive, faDiceSix } from '@fortawesome/free-solid-svg-icons';
 
 const styles = {
