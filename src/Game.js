@@ -129,23 +129,15 @@ class Game extends Component {
 
   componentDidMount(){
     this.animateRoll();
-    console.log("componentDidMount");
-  }
-
-  componentDidUpdate(){
-  	console.log("componentDidUpdate");
-  	// this.bonusYahtzee(); /////////DELETE
   }
 
   animateRoll(){
-    console.log("animateROLL");
     this.setState({rolling: true}, () => {
       setTimeout(this.roll, 1000);
     });
   }
 
   roll(evt){
-    console.log("ROLL");
     //roll unlocked dice and reset bonus yahtzee related states
     this.setState(st => ({
       dice: st.dice.map((d, i) =>
@@ -174,7 +166,6 @@ class Game extends Component {
   }
 
   doScore(rulename, ruleFn){
-    console.log("doSCORE");
     //calculate the score for the rulename by calling a rule function
     //when bonus yahtzee only allow specific ones to be scored and add bonus points if available
     //
@@ -198,7 +189,6 @@ class Game extends Component {
   }
 
   checkForUpperBonus(){
-    console.log("checkforupperbonus");
     //set the upper bonus score when all upper section is filled
     const bonusUpperNotSet = this.state.bonusUpperPoints === undefined;
     const upperScores = Object.values(this.state.scores).slice(0,6);
@@ -224,7 +214,6 @@ class Game extends Component {
   }
 
   bonusYahtzee(){
-    console.log("bonusYahtzee");
     //check for rolled bonus yahtzee, set rule rows available for scoring it and determine if bonus points will be given
   	const diceValues = this.state.dice;
     const scores = this.state.scores;
@@ -271,7 +260,6 @@ class Game extends Component {
   }
 
   checkIfOver(){
-    console.log("checkIFOVER");
     //game over when whole scoretable is filled
     const scoreBoardFull = Object.values(this.state.scores).every(s => s !== undefined);
     if(scoreBoardFull){
@@ -291,7 +279,6 @@ class Game extends Component {
             gameOver, bonusYahtzee, bonusYahtzeePoints, availableJoker } = this.state;
 		const classes = this.props.classes;
     const buttonClasses = this.props.width === 'xs' ? clsx(classes.gameButton, classes.gameButtonXS) : classes.gameButton;
-		console.log("game render");
 		return (
 			<Container maxWidth="sm" className={classes.gameContainer}>
         <Box component="header" px="3rem" className={classes.gameHeader}>
