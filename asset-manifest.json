@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/yahtzee-react/static/css/main.81dbfc1d.chunk.css",
+    "main.js": "/yahtzee-react/static/js/main.6d933202.chunk.js",
+    "main.js.map": "/yahtzee-react/static/js/main.6d933202.chunk.js.map",
+    "runtime-main.js": "/yahtzee-react/static/js/runtime-main.90f26a71.js",
+    "runtime-main.js.map": "/yahtzee-react/static/js/runtime-main.90f26a71.js.map",
+    "static/js/2.57ae64e0.chunk.js": "/yahtzee-react/static/js/2.57ae64e0.chunk.js",
+    "static/js/2.57ae64e0.chunk.js.map": "/yahtzee-react/static/js/2.57ae64e0.chunk.js.map",
+    "index.html": "/yahtzee-react/index.html",
+    "precache-manifest.b70b606f877ab1535a52e92b052d3287.js": "/yahtzee-react/precache-manifest.b70b606f877ab1535a52e92b052d3287.js",
+    "service-worker.js": "/yahtzee-react/service-worker.js",
+    "static/css/main.81dbfc1d.chunk.css.map": "/yahtzee-react/static/css/main.81dbfc1d.chunk.css.map",
+    "static/js/2.57ae64e0.chunk.js.LICENSE.txt": "/yahtzee-react/static/js/2.57ae64e0.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.90f26a71.js",
+    "static/js/2.57ae64e0.chunk.js",
+    "static/css/main.81dbfc1d.chunk.css",
+    "static/js/main.6d933202.chunk.js"
+  ]
+}
