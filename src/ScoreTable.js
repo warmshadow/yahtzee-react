@@ -102,7 +102,7 @@ class ScoreTable extends PureComponent {
                 name="Ones" 
                 score={scores.ones} 
                 doScore={evt => doScore("ones", ones.evalRoll)} 
-                descScores={descScores.twos} 
+                descScores={descScores.ones} 
                 bonusYahtzee={bonusYahtzee} 
                 availableJoker={availableJoker.ones} 
               />
